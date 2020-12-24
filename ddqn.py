@@ -14,17 +14,18 @@ from tf_agents.utils import common
 from environment import GameEnv
 
 num_iterations = 20_000
-warmup_steps = 10_000
+warmup_steps = 20_000
 collect_steps_per_iteration = 1
 replay_buffer_max_length = 10_000
 target_update_period = 500
 decay_episodes = 5_000
 min_epsilon = 0.1
-gamma = 0.95
+gamma = 0.99
+n_step_update = 1
 
 batch_size = 32
 learning_rate = 0.001
-log_interval = 200
+log_interval = 500
 
 num_eval_episodes = 10
 eval_interval = 1_000
@@ -48,7 +49,8 @@ agent = DdqnAgent(train_env.time_step_spec(),
                   train_step_counter=train_step_counter,
                   epsilon_greedy=epsilon_greedy,
                   gamma=gamma,
-                  target_update_period=target_update_period)
+                  target_update_period=target_update_period,
+                  n_step_update=n_step_update)
 
 agent.initialize()
 agent.train = common.function(agent.train)
@@ -94,7 +96,7 @@ warmup_driver.run(time_step=None, policy_state=random_policy.get_initial_state(t
 
 dataset = replay_buffer.as_dataset(num_parallel_calls=3,
                                    sample_batch_size=batch_size,
-                                   num_steps=2).prefetch(3)
+                                   num_steps=n_step_update + 1).prefetch(3)
 iterator = iter(dataset)
 
 avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
@@ -114,7 +116,7 @@ for _ in range(num_iterations):
 
     if step % eval_interval == 0:
         avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
-        print(f"{step=}; {avg_return=}")
+        print(f"\x1b[6;30;42m{step=}; {avg_return=}\x1b[0m")
         returns.append(avg_return)
 
 time_step = eval_env.reset()
@@ -128,11 +130,11 @@ while not time_step.is_last():
     line = plt.imshow(time_step.observation.numpy().reshape((4, 4)), animated=True)
     episode_return += time_step.reward
 
-    text = f"Action: {actions.get(action_step.action.numpy()[0])}; Score: {episode_return}"
+    text = f"Action: {actions.get(action_step.action.numpy()[0])}; Score: {episode_return[0]}"
     title = ax.text(0.5, 1.05, text, size=plt.rcParams["axes.titlesize"], ha="center", transform=ax.transAxes)
     ims.append([line, title])
 
 plt.rcParams['animation.ffmpeg_path'] = "D:/ffmpeg/bin/ffmpeg.exe"
-ani = animation.ArtistAnimation(fig, ims, interval=200, repeat=True, blit=False, repeat_delay=1000)
-ani.save("2048trained.gif")  # Can take a few seconds
+ani = animation.ArtistAnimation(fig, ims, interval=200, blit=False, repeat=True)
+ani.save("2048trained1.gif")  # Can take a few seconds
 plt.show()

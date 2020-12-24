@@ -18,8 +18,6 @@ class GameEnv(PyEnvironment):
         self._action_spec = BoundedArraySpec(shape=(), dtype=np.int32, minimum=0, maximum=3, name="action")
         self._observation_spec = ArraySpec(shape=(16,), dtype=np.int32, name="observation")
         self._episode_ended = False
-
-        self.episode_step = 0  # Episode step, resets every episode
         self._state = logic.reset_game()
 
     def action_spec(self):
@@ -32,7 +30,6 @@ class GameEnv(PyEnvironment):
 
     def _reset(self):
         """Shuffles data and returns the first state to begin training on new episode."""
-        self.episode_step = 0  # Reset episode step counter at the end of every episode
         self._state = logic.reset_game()
         self._episode_ended = False
 
@@ -46,9 +43,9 @@ class GameEnv(PyEnvironment):
         if self._episode_ended:
             # The last action ended the episode. Ignore the current action and start a new episode
             return self.reset()
-        self.episode_step += 1
 
         state, reward, terminal = step(self._state, action)
+
         self._episode_ended = terminal  # Stop episode when minority class is misclassified
         self._state = state  # Update state with new datapoint
 
