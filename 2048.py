@@ -2,38 +2,39 @@ import logic
 
 
 def step(state, action):
-    if(action.lower() == "w"):
-        state, terminal = logic.move_up(state)
+    """
+    Returns (next_state, reward, terminal) based on current (state, action) pair.
+    """
 
-    elif(action.lower() == "s"):
-        state, terminal = logic.move_down(state)
+    if(action.lower() == "w"):
+        next_state, terminal = logic.move_up(state)
 
     elif(action.lower() == "a"):
-        state, terminal = logic.move_left(state)
+        next_state, terminal = logic.move_left(state)
+
+    elif(action.lower() == "s"):
+        next_state, terminal = logic.move_down(state)
 
     elif(action.lower() == "d"):
-        state, terminal = logic.move_right(state)
+        next_state, terminal = logic.move_right(state)
 
     else:
         raise ValueError(f"Invalid action: {action}")
 
-    win = logic.check_win(state)
+    win = logic.check_win(next_state)
 
     if win:  # If game is won
-        reward = 1
-        return logic.start_game(), reward, win
+        return logic.reset_game(), 1, win
 
-    elif terminal:  # If game is lost
-        reward = -1
-        return logic.start_game(), reward, terminal
+    elif terminal:  # If a new 2 is not possible
+        return logic.reset_game(), -1, terminal
 
     else:  # Next state is valid and game is not over yet
-        reward = 0
-        return state, reward, terminal
+        return next_state, 0, terminal
 
 
 if __name__ == '__main__':
-    state = logic.start_game()
+    state = logic.reset_game()
     print(state)
 
     for _ in range(3):  # Dump game loop

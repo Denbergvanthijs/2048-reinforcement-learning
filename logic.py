@@ -3,13 +3,19 @@ import random
 import numpy as np
 
 
-def start_game():
+def reset_game():
     mat = np.zeros((4, 4), dtype=int)
     mat[random.randint(0, 3), random.randint(0, 3)] = 2  # Fill random value with 2
     return mat
 
 
 def add_new_2(mat):
+    """
+    Returns either:
+
+    False: Able to place a new 2
+    True: Not able to place new 2
+    """
     idxs = np.argwhere(mat == 0)  # All indices where the value is 0
 
     if idxs.any():  # If any value is 0
@@ -97,23 +103,3 @@ def move_down(grid):
     new_grid = transpose(new_grid)
 
     return new_grid, valid
-
-
-if __name__ == "__main__":
-    mat = start_game()
-    # mat = np.zeros((4, 4), dtype=int)
-    # mat[0] = 1
-    print(mat)
-    mat, state = move_left(mat)
-    print(mat, state)
-    mat = add_new_2(mat)
-    print(mat)
-    mat, state = move_right(mat)
-    print(mat, state)
-
-    # mat = np.ones(shape=(4, 4))  # Game over
-    # res = get_current_state(mat)
-    # print(res)
-    # mat = np.full((4, 4), 2048)  # Win
-    # res = get_current_state(mat)
-    # print(res)
