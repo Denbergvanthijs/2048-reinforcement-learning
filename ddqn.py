@@ -136,5 +136,5 @@ while not time_step.is_last():
 
 plt.rcParams['animation.ffmpeg_path'] = "D:/ffmpeg/bin/ffmpeg.exe"
 ani = animation.ArtistAnimation(fig, ims, interval=200, blit=False, repeat=True)
-ani.save("2048trained1.gif")  # Can take a few seconds
+ani.save("2048trained.gif")  # Can take a few seconds
 plt.show()
