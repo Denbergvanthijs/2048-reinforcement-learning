@@ -1,3 +1,8 @@
+from itertools import cycle
+
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+
 import logic
 
 
@@ -35,8 +40,19 @@ def step(state, action):
 
 if __name__ == '__main__':
     state = logic.reset_game()
+    wasd_cycle = cycle("wasd")
     print(state)
 
-    for _ in range(3):  # Dump game loop
-        state, reward, terminal = step(state, "w")
+    fig = plt.figure()
+    ims = []
+    while True:  # Dump game loop
+        ims.append([plt.imshow(state, animated=True)])
+        state, reward, terminal = step(state, next(wasd_cycle))
+        if terminal:  # Stop at win or when no empty spot is left
+            break
+
         print(state, reward, terminal)
+
+    ani = animation.ArtistAnimation(fig, ims, interval=200, repeat=True, blit=True, repeat_delay=1000)
+    ani.save("2048.gif")  # Can take a few seconds
+    # plt.show()
