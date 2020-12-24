@@ -53,12 +53,14 @@ def compress(mat):
 
 
 def merge(mat):
+    local_reward = 0  # Collected reward during this single merge
     for i in range(4):
         for j in range(3):
             if(mat[i][j] == mat[i][j + 1] and mat[i][j] != 0):
                 mat[i][j] = mat[i][j] * 2
+                local_reward += mat[i][j]
                 mat[i][j + 1] = 0
-    return mat
+    return mat, local_reward
 
 
 def reverse(mat):
@@ -74,32 +76,32 @@ def transpose(mat):
 
 def move_left(grid):
     new_grid = compress(grid)
-    new_grid = merge(new_grid)
+    new_grid, reward = merge(new_grid)
     new_grid = compress(new_grid)
     new_grid, valid = add_new_2(new_grid)
 
-    return new_grid, valid
+    return new_grid, valid, reward
 
 
 def move_right(grid):
     new_grid = reverse(grid)
-    new_grid, valid = move_left(new_grid)
+    new_grid, valid, reward = move_left(new_grid)
     new_grid = reverse(new_grid)
 
-    return new_grid, valid
+    return new_grid, valid, reward
 
 
 def move_up(grid):
     new_grid = transpose(grid)
-    new_grid, valid = move_left(new_grid)
+    new_grid, valid, reward = move_left(new_grid)
     new_grid = transpose(new_grid)
 
-    return new_grid, valid
+    return new_grid, valid, reward
 
 
 def move_down(grid):
     new_grid = transpose(grid)
-    new_grid, valid = move_right(new_grid)
+    new_grid, valid, reward = move_right(new_grid)
     new_grid = transpose(new_grid)
 
-    return new_grid, valid
+    return new_grid, valid, reward
